@@ -24,7 +24,8 @@ The action designed only for updates. If you do not yet have a Sideko generated 
 ## Quick Start
 1. *Create a Sideko API key* - In the Sideko UI, click the "API Keys" tab and create an API with scoped access to the API that the SDK is for.
 2. *Create a GitHub Token* - [Follow this guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) from Github to retrieve a GitHub token.
-3. Use the sample GitHub workflow to create your own SDK update action.
+3. Use the sample workflow (below) to build your own SDK update workflow.
+4. Add your preferred dependency check actions, security scan actions, etc.
 
 
 
