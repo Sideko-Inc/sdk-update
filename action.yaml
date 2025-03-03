@@ -130,50 +130,6 @@ runs:
       working-directory: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}
       run: cargo check
 
-    # -------------------------------------------------
-    #  Typescript ONLY - Update package-lock.json
-    # -------------------------------------------------
-    - name: Setup Node
-      if: ${{ inputs.language == 'typescript' && steps.update-sdk.outputs.has_changes == 'true' }}
-      uses: actions/setup-node@v3
-      with:
-        cache: "npm"
-        cache-dependency-path: "${{ steps.checkout-sdk-repo.outputs.checkout_dir }}/package-lock.json"
-    - name: Update package-lock.json
-      if: ${{ inputs.language == 'typescript' && steps.update-sdk.outputs.has_changes == 'true' }}
-      shell: bash
-      working-directory: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}
-      run: npm install
-
-    # -------------------------------------------------
-    #  Python ONLY - Update poetry.lock
-    # -------------------------------------------------
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      if: ${{ inputs.language == 'python' && steps.update-sdk.outputs.has_changes == 'true' }}
-      with:
-        python-version: "3.8"
-    - name: Setup Poetry
-      if: ${{ inputs.language == 'python' && steps.update-sdk.outputs.has_changes == 'true' }}
-      uses: snok/install-poetry@v1
-      with:
-        version: 1.8.5
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-        virtualenvs-path: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}/.venv
-        installer-parallel: true
-    - name: Load Cached Python Dependencies
-      if: ${{ inputs.language == 'python' && steps.update-sdk.outputs.has_changes == 'true' }}
-      uses: actions/cache@v4
-      with:
-        path: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}.venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-    - name: Update poetry.lock
-      if: ${{ inputs.language == 'python' && steps.update-sdk.outputs.has_changes == 'true' }}
-      working-directory: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}
-      shell: bash
-      run: poetry lock --no-update
-
     - name: Push & Open PR
       id: push-open-pr
       shell: bash
