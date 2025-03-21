@@ -153,16 +153,16 @@ runs:
         git push origin "$branch"
 
         # Open PR
-        description="SDK release $(date +%Y-%m-%d)"
+        description=""
         if [ -n "${{ inputs.pr-description }}" ]; then
-          description+="\n${{ inputs.pr-description }}"
+          description="${{ inputs.pr-description }}"
         fi
         pr_title="${{ inputs.pr-title-template }}"
         pr_title="${pr_title/\{type\}/${{ inputs.sdk-version }}}"
 
         pr_url=$(gh pr create \
           --title "$pr_title" \
-          --body "$(format_pr_description)" \
+          --body "$description" \
           --repo "$repo" \
           --head "$branch" \
           --base "${{ inputs.pr-base-branch }}")
@@ -178,10 +178,17 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.github-token }}
       run: |
-        echo "Automatically merging ${{ steps.push-open-pr.outputs.pr_url }}..."
-        # First enable auto-merge on the repository if not already enabled
-        gh repo edit "$repo" --enable-auto-merge || true
-        # Then enable it for the PR
-        gh pr merge "$pr_url" --auto --merge --delete-branch || true
+        echo "Attempting automatic merge of ${{ steps.push-open-pr.outputs.pr_url }}..."
+        if ! gh repo edit "${{ inputs.repo }}" --enable-auto-merge; then
+          echo "::warning::Failed to enable auto-merge at repository level for $repo"
+          # Continue despite this warning as some repositories have it enabled already
+        fi
+
+        if ! gh pr merge "${{ steps.push-open-pr.outputs.pr_url }}" --auto --merge --delete-branch; then
+          echo "::error::Failed to enable auto-merge for PR. Check branch protection rules and permissions."
+          echo "merge_status=failed" >> $GITHUB_OUTPUT
+          # This will exit with error code 1, causing the action to fail
+          exit 1
+        fi
 
         echo "✅ PR Merged"
