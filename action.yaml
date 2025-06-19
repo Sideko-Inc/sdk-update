@@ -141,6 +141,7 @@ runs:
     - name: Update go.sum
       shell: bash
       if: ${{ inputs.language == 'go' && steps.update-sdk.outputs.has_changes == 'true' }}
+      working-directory: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}
       run: go mod tidy
 
     # -------------------------------------------------
