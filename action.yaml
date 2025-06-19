@@ -130,6 +130,23 @@ runs:
       working-directory: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}
       run: cargo check
 
+    # -------------------------------------------------
+    #  Go ONLY - Update go.sum
+    # -------------------------------------------------
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      if: ${{ inputs.language == 'go' && steps.update-sdk.outputs.has_changes == 'true' }}
+      with:
+        go-version: ">=1.19.0"
+    - name: Update go.sum
+      shell: bash
+      if: ${{ inputs.language == 'go' && steps.update-sdk.outputs.has_changes == 'true' }}
+      run: go mod tidy
+
+    # -------------------------------------------------
+    #  Create & optionally merge PR
+    # -------------------------------------------------
+
     - name: Push & Open PR
       id: push-open-pr
       shell: bash
