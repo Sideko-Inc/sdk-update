@@ -60,7 +60,8 @@ runs:
       shell: bash
       run: |
         if ! command -v sideko > /dev/null 2>&1; then
-            curl -fsSL https://raw.githubusercontent.com/Sideko-Inc/sideko/main/install.sh | sh;
+            echo "Installing Sideko CLI via npm..."
+            npm install -g @sideko/cli
         else
             echo "Sideko CLI already installed: $(sideko -V)"
         fi
