@@ -118,6 +118,15 @@ runs:
         fi
 
     # -------------------------------------------------
+    #  Typescript ONLY - Update package-lock.json
+    # -------------------------------------------------
+    - name: Update package-lock.json
+      shell: bash
+      if: ${{ inputs.language == 'typescript' && steps.update-sdk.outputs.has_changes == 'true' }}
+      working-directory: ${{ steps.checkout-sdk-repo.outputs.checkout_dir }}
+      run: npm install --package-lock-only --ignore-scripts
+
+    # -------------------------------------------------
     #  Rust ONLY - Update Cargo.lock
     # -------------------------------------------------
     - name: Setup Rust
